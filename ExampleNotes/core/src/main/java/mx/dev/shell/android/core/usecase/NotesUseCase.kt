@@ -1,6 +1,8 @@
 package mx.dev.shell.android.core.usecase
 
-interface NotesUseCase {
+import kotlinx.coroutines.flow.Flow
+import mx.dev.shell.android.core.model.NoteBo
 
-    suspend fun loadNotes()
+interface NotesUseCase {
+    suspend fun loadNotes(): Flow<Result<List<NoteBo>>>
 }
