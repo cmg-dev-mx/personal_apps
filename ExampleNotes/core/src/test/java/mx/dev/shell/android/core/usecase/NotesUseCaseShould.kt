@@ -16,6 +16,7 @@ class NotesUseCaseShould: BaseUnitTest() {
 
     private val repository = mock(NotesRepository::class.java)
     private val expected = mock(List::class.java) as List<NoteBo>
+    private val errorExpected = RuntimeException("Something went wrong")
 
     @Test
     fun loadNotesFromRepository() = runTest {
@@ -26,10 +27,27 @@ class NotesUseCaseShould: BaseUnitTest() {
 
     @Test
     fun emitNotesFromRepository() = runTest {
+        val useCase = mockSuccesfulCase()
+        assertEquals(expected, useCase.loadNotes().first().getOrNull()!!)
+    }
+
+    @Test
+    fun emitErrorFromRepository() = runTest {
+        val useCase = mockFailureCase()
+        assertEquals(errorExpected, useCase.loadNotes().first().exceptionOrNull()!!)
+    }
+
+    private suspend fun mockFailureCase(): NotesUseCaseImpl {
+        `when`(repository.loadNotes()).thenReturn(
+            flow { emit(Result.failure(errorExpected)) }
+        )
+        return NotesUseCaseImpl(repository)
+    }
+
+    private suspend fun mockSuccesfulCase(): NotesUseCaseImpl {
         `when`(repository.loadNotes()).thenReturn(
             flow { emit(Result.success(expected)) }
         )
-        val useCase = NotesUseCaseImpl(repository)
-        assertEquals(expected, useCase.loadNotes().first().getOrNull()!!)
+        return NotesUseCaseImpl(repository)
     }
 }

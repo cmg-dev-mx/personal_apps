@@ -1,4 +1,4 @@
-package mx.dev.shell.android.core.utils
+package mx.dev.shell.android.repository.utils
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
