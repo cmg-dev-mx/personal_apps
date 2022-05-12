@@ -5,5 +5,4 @@ import mx.dev.shell.android.db.model.NoteDo
 
 interface NoteDataSource {
     suspend fun queryNotes(): Flow<Result<List<NoteDo>>>
-
 }
