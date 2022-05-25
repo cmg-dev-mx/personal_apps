@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mx.dev.shell.android.core.model.NoteBo
 import mx.dev.shell.android.core.usecase.NotesUseCase
+import javax.inject.Inject
 
-class NotesViewModel constructor(
+class NotesViewModel @Inject constructor(
     private val useCase: NotesUseCase
 ) : ViewModel() {
 

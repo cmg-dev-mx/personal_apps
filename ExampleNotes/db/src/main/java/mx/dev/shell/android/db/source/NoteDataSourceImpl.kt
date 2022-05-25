@@ -4,8 +4,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mx.dev.shell.android.db.dao.NoteDao
 import mx.dev.shell.android.db.model.NoteDo
+import javax.inject.Inject
 
-class NoteDataSourceImpl constructor(
+class NoteDataSourceImpl @Inject constructor(
     private val dao: NoteDao
 ) : NoteDataSource {
 

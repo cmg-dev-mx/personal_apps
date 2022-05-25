@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".flow.notes.MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/notes_fragment_container"

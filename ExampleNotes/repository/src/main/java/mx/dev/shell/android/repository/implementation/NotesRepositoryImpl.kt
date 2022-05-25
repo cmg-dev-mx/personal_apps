@@ -6,8 +6,9 @@ import mx.dev.shell.android.core.model.NoteBo
 import mx.dev.shell.android.core.repository.NotesRepository
 import mx.dev.shell.android.db.source.NoteDataSource
 import mx.dev.shell.android.repository.mapper.NoteMapper
+import javax.inject.Inject
 
-class NotesRepositoryImpl constructor(
+class NotesRepositoryImpl @Inject constructor(
     private val source: NoteDataSource,
     private val mapper: NoteMapper
 ) : NotesRepository {
