@@ -1,0 +1,8 @@
+package mx.dev.shell.android.core.usecase
+
+import kotlinx.coroutines.flow.Flow
+import mx.dev.shell.android.core.model.NoteBo
+
+interface NoteDetailUseCase {
+    suspend fun queryNote(noteId: Int): Flow<Result<NoteBo>>
+}

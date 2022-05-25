@@ -1,4 +1,4 @@
-package mx.dev.shell.android.examplenotes.flow.notes.layout
+package mx.dev.shell.android.examplenotes.flow.note.layout
 
 import android.os.Bundle
 import android.view.LayoutInflater

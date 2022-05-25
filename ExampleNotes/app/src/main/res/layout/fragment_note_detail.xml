@@ -4,4 +4,4 @@
     android:id="@+id/note_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".flow.notes.layout.NoteDetailFragment" />
+    tools:context=".flow.note.layout.NoteDetailFragment" />
