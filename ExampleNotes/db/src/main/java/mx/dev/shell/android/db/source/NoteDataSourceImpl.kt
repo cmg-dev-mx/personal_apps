@@ -16,4 +16,8 @@ class NoteDataSourceImpl @Inject constructor(
     } catch (e: Exception) {
         flow { emit(Result.failure(e)) }
     }
+
+    override suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>> {
+        TODO("Not yet implemented")
+    }
 }

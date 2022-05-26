@@ -5,4 +5,5 @@ import mx.dev.shell.android.db.model.NoteDo
 
 interface NoteDataSource {
     suspend fun queryNotes(): Flow<Result<List<NoteDo>>>
+    suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>>
 }
