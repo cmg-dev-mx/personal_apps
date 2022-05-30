@@ -18,6 +18,11 @@ class NoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>> {
-        TODO("Not yet implemented")
+        return try {
+            val note = dao.getNote(noteId)
+            flow { emit(Result.success(note)) }
+        } catch (e: Exception) {
+            flow { emit(Result.failure(e)) }
+        }
     }
 }
