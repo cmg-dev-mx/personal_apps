@@ -21,12 +21,15 @@ class NotesAdapter(
         )
     )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(list[position], itemSelectedListener)
-    }
 
-    override fun getItemCount(): Int {
-        TODO("Not yet implemented")
+    override fun getItemCount() = list.size
+
+    fun updateNotes(newList: List<NoteBo>) {
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {

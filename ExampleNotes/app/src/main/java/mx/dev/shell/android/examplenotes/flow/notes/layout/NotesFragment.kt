@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mx.dev.shell.android.examplenotes.databinding.FragmentNotesBinding
 import mx.dev.shell.android.examplenotes.flow.notes.adapter.NotesAdapter
@@ -24,7 +26,8 @@ class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
 
     private val notesAdapter = NotesAdapter(arrayListOf()) { noteId ->
-        // TODO Not yet implemented
+        val action = NotesFragmentDirections.actionNotesFragmentToNoteDetailFragment(noteId)
+        findNavController().navigate(action)
     }
 
     override fun onCreateView(
@@ -54,10 +57,34 @@ class NotesFragment : Fragment() {
     }
 
     private fun setupViewModel() {
-
+        viewModel = ViewModelProvider(this, factory).get(NotesViewModel::class.java)
     }
 
     private fun observeViewModel() {
-
+        viewModel.notes.observe(viewLifecycleOwner) { notes ->
+            notesAdapter.updateNotes(notes)
+        }
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Snackbar.make(binding.notesFragmentContainer, error, Snackbar.LENGTH_LONG).show()
+                viewModel.error.value = null
+            }
+        }
+        viewModel.showProgressbar.observe(viewLifecycleOwner) { show ->
+            if (show) {
+                binding.notesProgressbar.visibility = View.VISIBLE
+            } else {
+                binding.notesProgressbar.visibility = View.GONE
+            }
+        }
+        viewModel.showEmptyList.observe(viewLifecycleOwner) { show ->
+            if (show) {
+                binding.notesEmptyTxt.visibility = View.VISIBLE
+                binding.notesNotesRec.visibility = View.GONE
+            } else {
+                binding.notesEmptyTxt.visibility = View.GONE
+                binding.notesNotesRec.visibility = View.VISIBLE
+            }
+        }
     }
 }
