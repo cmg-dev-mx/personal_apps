@@ -62,10 +62,41 @@ class NoteDetailViewModelShould : BaseUnitTest() {
         }
     }
 
+    @Test
+    fun saveNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.saveNote(expected)
+        verify(useCase, times(1)).saveNote(expected)
+    }
+
+    @Test
+    fun emitNoteIdFromUseCase() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.saveNote(expected)
+        vm.noteSaved.captureValues {
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun emitErrorFromUseCaseInSaveNewNote() = runTest {
+        val vm = mockFailureCase()
+        vm.saveNote(expected)
+        vm.errorMessage.captureValues {
+            assertEquals(exceptionExpected.message, values.first())
+        }
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDetailViewModel {
         `when`(useCase.queryNote(noteId)).thenReturn(
             flow {
                 emit(Result.success(expected))
+            }
+        )
+
+        `when`(useCase.saveNote(expected)).thenReturn(
+            flow {
+                emit(Result.success(noteId))
             }
         )
         return NoteDetailViewModel(useCase)
@@ -73,6 +104,12 @@ class NoteDetailViewModelShould : BaseUnitTest() {
 
     private suspend fun mockFailureCase(): NoteDetailViewModel {
         `when`(useCase.queryNote(noteId)).thenReturn(
+            flow {
+                emit(Result.failure(exceptionExpected))
+            }
+        )
+
+        `when`(useCase.saveNote(expected)).thenReturn(
             flow {
                 emit(Result.failure(exceptionExpected))
             }

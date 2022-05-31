@@ -16,6 +16,7 @@ class NoteDetailViewModel @Inject constructor(
     val note = MutableLiveData<NoteBo>()
     val errorMessage = MutableLiveData<String>()
     val showProgressBar = MutableLiveData<Boolean>()
+    val noteSaved = MutableLiveData<Boolean>()
 
     fun queryNote(noteId: Int) {
         viewModelScope.launch {
@@ -30,6 +31,22 @@ class NoteDetailViewModel @Inject constructor(
                     errorMessage.postValue(it.exceptionOrNull()?.message?:"")
                 }
             }
+        }
+    }
+
+    fun saveNote(note: NoteBo) {
+        viewModelScope.launch {
+            showProgressBar.postValue(true)
+            useCase.saveNote(note)
+                .onEach {
+                    showProgressBar.postValue(false)
+                }.collect {
+                    if (it.isSuccess) {
+                        noteSaved.postValue(true)
+                    } else {
+                        errorMessage.postValue(it.exceptionOrNull()?.message?:"")
+                    }
+                }
         }
     }
 }
