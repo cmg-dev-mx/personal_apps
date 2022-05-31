@@ -25,4 +25,8 @@ class NoteDataSourceImpl @Inject constructor(
             flow { emit(Result.failure(e)) }
         }
     }
+
+    override suspend fun saveNote(note: NoteDo): Flow<Result<NoteDo>> {
+        TODO("Not yet implemented")
+    }
 }

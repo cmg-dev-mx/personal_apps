@@ -9,7 +9,6 @@ import mx.dev.shell.android.core.model.NoteBo
 import mx.dev.shell.android.db.model.NoteDo
 import mx.dev.shell.android.db.source.NoteDataSource
 import mx.dev.shell.android.repository.mapper.NoteMapper
-import mx.dev.shell.android.repository.mapper.NotesMapper
 import mx.dev.shell.android.repository.utils.BaseUnitTest
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -18,7 +17,6 @@ import org.mockito.Mockito.*
 class NotesRepositoryShould: BaseUnitTest() {
 
     private val source = mock(NoteDataSource::class.java)
-    private val notesMapper = mock(NotesMapper::class.java)
     private val noteMapper = mock(NoteMapper::class.java)
 
     private val expected = mock(List::class.java) as List<NoteBo>
@@ -58,7 +56,7 @@ class NotesRepositoryShould: BaseUnitTest() {
     fun delegateBusinessLogicToMapper() = runTest {
         val repository = mockSuccessfulCase()
         repository.loadNotes().first()
-        verify(notesMapper, times(1)).invoke(noteListDo)
+        verify(noteMapper, times(1)).fromListDoToListBo(noteListDo)
     }
 
     @Test
@@ -80,22 +78,62 @@ class NotesRepositoryShould: BaseUnitTest() {
         assertEquals(errorExpected, repository.queryNote(noteId).first().exceptionOrNull())
     }
 
+    @Test
+    fun saveNoteFromSource() = runTest {
+        val repository = mockSuccessfulCase()
+        repository.saveNote(noteExpected)
+        verify(source, times(1)).saveNote(noteDo)
+    }
+
+    @Test
+    fun emitNoteIdFromSource() = runTest {
+        val repository = mockSuccessfulCase()
+        assertEquals(0, repository.saveNote(noteExpected).first().getOrNull())
+    }
+
+    @Test
+    fun delegateBusinessLogicToMapperForSave() = runTest {
+        val repository = mockSuccessfulCase()
+        repository.saveNote(noteExpected)
+        verify(noteMapper, times(1)).fromBoToDo(noteExpected)
+    }
+
+    @Test
+    fun emitErrorFromMapperInSaveNote() = runTest {
+        val repository = mockFailureMapperCase()
+        assertEquals(errorExpected, repository.saveNote(noteExpected).first().exceptionOrNull())
+    }
+
+    @Test
+    fun emitErrorFromSourceInSaveNote() = runTest {
+        val repository = mockFailureCase()
+        assertEquals(errorExpected, repository.saveNote(noteExpected).first().exceptionOrNull())
+    }
+
     private suspend fun mockSuccessfulCase(): NotesRepositoryImpl {
         `when`(source.queryNotes()).thenReturn(
             flow {
                 emit(Result.success(noteListDo))
             }
         )
-        `when`(notesMapper.invoke(noteListDo)).thenReturn(expected)
+        `when`(noteMapper.fromListDoToListBo(noteListDo)).thenReturn(expected)
 
         `when`(source.queryNote(noteId)).thenReturn(
             flow {
                 emit(Result.success(noteDo))
             }
         )
-        `when`(noteMapper.invoke(noteDo)).thenReturn(noteExpected)
+        `when`(noteMapper.fromDoToBo(noteDo)).thenReturn(noteExpected)
 
-        return NotesRepositoryImpl(source, notesMapper, noteMapper)
+        `when`(source.saveNote(noteDo)).thenReturn(
+            flow {
+                emit(Result.success(noteDo))
+            }
+        )
+
+        `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
+
+        return NotesRepositoryImpl(source, noteMapper)
     }
 
     private suspend fun mockFailureCase(): NotesRepositoryImpl {
@@ -105,7 +143,15 @@ class NotesRepositoryShould: BaseUnitTest() {
             }
         )
 
-        return NotesRepositoryImpl(source, notesMapper, noteMapper)
+        `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
+
+        `when`(source.saveNote(noteDo)).thenReturn(
+            flow {
+                emit(Result.failure(errorExpected))
+            }
+        )
+
+        return NotesRepositoryImpl(source, noteMapper)
     }
 
     private suspend fun mockFailureMapperCase(): NotesRepositoryImpl {
@@ -114,9 +160,11 @@ class NotesRepositoryShould: BaseUnitTest() {
                 emit(Result.success(noteListDo))
             }
         )
-        `when`(notesMapper.invoke(noteListDo)).thenThrow(errorExpected)
+        `when`(noteMapper.fromListDoToListBo(noteListDo)).thenThrow(errorExpected)
 
-        return NotesRepositoryImpl(source, notesMapper, noteMapper)
+        `when`(noteMapper.fromBoToDo(noteExpected)).thenThrow(errorExpected)
+
+        return NotesRepositoryImpl(source, noteMapper)
     }
 
     private suspend fun mockFailureMapperDetailCase(): NotesRepositoryImpl {
@@ -125,8 +173,8 @@ class NotesRepositoryShould: BaseUnitTest() {
                 emit(Result.success(noteDo))
             }
         )
-        `when`(noteMapper.invoke(noteDo)).thenThrow(errorExpected)
+        `when`(noteMapper.fromDoToBo(noteDo)).thenThrow(errorExpected)
 
-        return NotesRepositoryImpl(source, notesMapper, noteMapper)
+        return NotesRepositoryImpl(source, noteMapper)
     }
 }
