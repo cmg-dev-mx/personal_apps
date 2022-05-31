@@ -38,15 +38,40 @@ class NoteDetailUseCaseShould: BaseUnitTest() {
         assertEquals(errorExpected, uc.queryNote(noteId).first().exceptionOrNull()!!)
     }
 
+    @Test
+    fun saveNewNoteFromRepository() = runTest {
+        val uc = mockSuccessfulCase()
+        uc.saveNote(expected)
+        verify(repository, times(1)).saveNote(expected)
+    }
+
+    @Test
+    fun emitNoteIdFromRepositoryWhenSaveNewNote() = runTest {
+        val uc = mockSuccessfulCase()
+        assertEquals(noteId, uc.saveNote(expected).first().getOrNull()!!)
+    }
+
+    @Test
+    fun emitErroWhenSaveNewNoteFromRepository() = runTest {
+        val uc = mockFailureCase()
+        assertEquals(errorExpected, uc.saveNote(expected).first().exceptionOrNull()!!)
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDetailUseCaseImpl {
         `when`(repository.queryNote(noteId)).thenReturn(
             flow { emit(Result.success(expected)) }
+        )
+        `when`(repository.saveNote(expected)).thenReturn(
+            flow { emit(Result.success(noteId)) }
         )
         return NoteDetailUseCaseImpl(repository)
     }
 
     private suspend fun mockFailureCase(): NoteDetailUseCaseImpl {
         `when`(repository.queryNote(noteId)).thenReturn(
+            flow { emit(Result.failure(errorExpected)) }
+        )
+        `when`(repository.saveNote(expected)).thenReturn(
             flow { emit(Result.failure(errorExpected)) }
         )
         return NoteDetailUseCaseImpl(repository)
