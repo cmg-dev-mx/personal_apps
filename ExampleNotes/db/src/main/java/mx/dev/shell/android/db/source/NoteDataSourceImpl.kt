@@ -17,16 +17,18 @@ class NoteDataSourceImpl @Inject constructor(
         flow { emit(Result.failure(e)) }
     }
 
-    override suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>> {
-        return try {
-            val note = dao.getNote(noteId)
-            flow { emit(Result.success(note)) }
-        } catch (e: Exception) {
-            flow { emit(Result.failure(e)) }
-        }
+    override suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>> = try {
+        val note = dao.getNote(noteId)
+        flow { emit(Result.success(note)) }
+    } catch (e: Exception) {
+        flow { emit(Result.failure(e)) }
     }
 
-    override suspend fun saveNote(note: NoteDo): Flow<Result<NoteDo>> {
-        TODO("Not yet implemented")
+    override suspend fun saveNote(note: NoteDo): Flow<Result<NoteDo>> = try {
+        val noteId = dao.insertNote(note)
+        note.id = noteId.toInt()
+        flow { emit(Result.success(note)) }
+    } catch (e: Exception) {
+        flow { emit(Result.failure(e)) }
     }
 }

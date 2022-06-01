@@ -58,15 +58,36 @@ class NoteDataSourceShould: BaseUnitTest() {
         assertEquals(errorExpected, source.queryNote(noteId).first().exceptionOrNull()!!)
     }
 
+    @Test
+    fun insertNoteFromSource() = runTest {
+        val source = mockSuccessfulCase()
+        source.saveNote(noteExpected)
+        verify(dao, times(1)).insertNote(noteExpected)
+    }
+
+    @Test
+    fun emitNoteFromSourceInSaveNote() = runTest {
+        val source = mockSuccessfulCase()
+        assertEquals(noteExpected, source.saveNote(noteExpected).first().getOrNull()!!)
+    }
+
+    @Test
+    fun emitErrorFromSourceInSaveNote() = runTest {
+        val source = mockFailureCase()
+        assertEquals(errorExpected, source.saveNote(noteExpected).first().exceptionOrNull()!!)
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDataSourceImpl {
         `when`(dao.getAllNotes()).thenReturn(expected)
         `when`(dao.getNote(noteId)).thenReturn(noteExpected)
+        `when`(dao.insertNote(noteExpected)).thenReturn(0)
         return NoteDataSourceImpl(dao)
     }
 
     private suspend fun mockFailureCase(): NoteDataSourceImpl {
         `when`(dao.getAllNotes()).thenThrow(errorExpected)
         `when`(dao.getNote(noteId)).thenThrow(errorExpected)
+        `when`(dao.insertNote(noteExpected)).thenThrow(errorExpected)
         return NoteDataSourceImpl(dao)
     }
 }
