@@ -52,7 +52,7 @@ class NoteDetailUseCaseShould: BaseUnitTest() {
     }
 
     @Test
-    fun emitErroWhenSaveNewNoteFromRepository() = runTest {
+    fun emitErrorWhenSaveNewNoteFromRepository() = runTest {
         val uc = mockFailureCase()
         assertEquals(errorExpected, uc.saveNote(expected).first().exceptionOrNull()!!)
     }

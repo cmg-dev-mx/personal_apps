@@ -21,6 +21,4 @@ class NoteMapper @Inject constructor() {
     )
 
     fun fromListDoToListBo(p1: List<NoteDo>) = p1.map { fromDoToBo(it) }
-
-    fun fromListBoToListDo(p1: List<NoteBo>) = p1.map { fromBoToDo(it) }
 }

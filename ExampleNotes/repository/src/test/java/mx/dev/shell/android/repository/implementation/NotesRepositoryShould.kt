@@ -79,6 +79,13 @@ class NotesRepositoryShould: BaseUnitTest() {
     }
 
     @Test
+    fun delegateBusinessLogicToMapperInQueryNote() = runTest {
+        val repository = mockSuccessfulCase()
+        repository.queryNote(noteId).first()
+        verify(noteMapper, times(1)).fromDoToBo(noteDo)
+    }
+
+    @Test
     fun saveNoteFromSource() = runTest {
         val repository = mockSuccessfulCase()
         repository.saveNote(noteExpected)
@@ -117,20 +124,17 @@ class NotesRepositoryShould: BaseUnitTest() {
             }
         )
         `when`(noteMapper.fromListDoToListBo(noteListDo)).thenReturn(expected)
-
         `when`(source.queryNote(noteId)).thenReturn(
             flow {
                 emit(Result.success(noteDo))
             }
         )
         `when`(noteMapper.fromDoToBo(noteDo)).thenReturn(noteExpected)
-
         `when`(source.saveNote(noteDo)).thenReturn(
             flow {
                 emit(Result.success(noteDo))
             }
         )
-
         `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
 
         return NotesRepositoryImpl(source, noteMapper)
@@ -142,9 +146,7 @@ class NotesRepositoryShould: BaseUnitTest() {
                 emit(Result.failure(errorExpected))
             }
         )
-
         `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
-
         `when`(source.saveNote(noteDo)).thenReturn(
             flow {
                 emit(Result.failure(errorExpected))
@@ -161,7 +163,6 @@ class NotesRepositoryShould: BaseUnitTest() {
             }
         )
         `when`(noteMapper.fromListDoToListBo(noteListDo)).thenThrow(errorExpected)
-
         `when`(noteMapper.fromBoToDo(noteExpected)).thenThrow(errorExpected)
 
         return NotesRepositoryImpl(source, noteMapper)

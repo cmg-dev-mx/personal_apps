@@ -10,7 +10,7 @@ class NotesViewModelFactory @Inject constructor(
     private val notesUseCase: NotesUseCase
 ): ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return NotesViewModel(notesUseCase) as T
     }
 }

@@ -1,5 +1,6 @@
 package mx.dev.shell.android.examplenotes.flow.notes.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,7 @@ class NotesAdapter(
 
     override fun getItemCount() = list.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateNotes(newList: List<NoteBo>) {
         list.clear()
         list.addAll(newList)

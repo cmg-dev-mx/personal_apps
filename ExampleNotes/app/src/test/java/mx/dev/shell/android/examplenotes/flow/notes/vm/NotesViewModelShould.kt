@@ -1,4 +1,4 @@
-package mx.dev.shell.android.examplenotes
+package mx.dev.shell.android.examplenotes.flow.notes.vm
 
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mx.dev.shell.android.core.model.NoteBo
 import mx.dev.shell.android.core.usecase.NotesUseCase
-import mx.dev.shell.android.examplenotes.flow.notes.vm.NotesViewModel
 import mx.dev.shell.android.examplenotes.utils.BaseUnitTest
 import mx.dev.shell.android.examplenotes.utils.captureValues
 import org.junit.Test
@@ -21,8 +20,7 @@ class NotesViewModelShould: BaseUnitTest() {
 
     @Test
     fun loadNotesFromUseCase() = runTest {
-        val viewModel = NotesViewModel(useCase)
-
+        val viewModel = mockSuccessfulCase()
         viewModel.loadNotes()
         verify(useCase, times(1)).loadNotes()
     }
@@ -30,7 +28,6 @@ class NotesViewModelShould: BaseUnitTest() {
     @Test
     fun emmitNotesFromUseCase() = runTest {
         val viewModel = mockSuccessfulCase()
-
         viewModel.notes.captureValues {
             viewModel.loadNotes()
             assertEquals(expectedNotes, values.first())
@@ -66,13 +63,7 @@ class NotesViewModelShould: BaseUnitTest() {
 
     @Test
     fun showEmptyMessageWhenUseCaseEmmitEmpty() = runTest {
-        `when`(useCase.loadNotes()).thenReturn(
-            flow {
-                emit(Result.success(listOf()))
-            }
-        )
-
-        val viewModel = NotesViewModel(useCase)
+        val viewModel = mockEmptyCase()
         viewModel.showEmptyList.captureValues {
             viewModel.loadNotes()
             assertEquals(true, values.first())
@@ -81,13 +72,7 @@ class NotesViewModelShould: BaseUnitTest() {
 
     @Test
     fun showListWhenUseCaseEmmitNotEmptyList() = runTest {
-        `when`(useCase.loadNotes()).thenReturn(
-            flow {
-                emit(Result.success(listOf(NoteBo())))
-            }
-        )
-
-        val viewModel = NotesViewModel(useCase)
+        val viewModel = mockNotEmptyCase()
         viewModel.showEmptyList.captureValues {
             viewModel.loadNotes()
             assertEquals(false, values.first())
@@ -107,6 +92,24 @@ class NotesViewModelShould: BaseUnitTest() {
         `when`(useCase.loadNotes()).thenReturn(
             flow {
                 emit(Result.failure(expectedException))
+            }
+        )
+        return NotesViewModel(useCase)
+    }
+
+    private suspend fun mockEmptyCase(): NotesViewModel {
+        `when`(useCase.loadNotes()).thenReturn(
+            flow {
+                emit(Result.success(listOf()))
+            }
+        )
+        return NotesViewModel(useCase)
+    }
+
+    private suspend fun mockNotEmptyCase(): NotesViewModel {
+        `when`(useCase.loadNotes()).thenReturn(
+            flow {
+                emit(Result.success(listOf(NoteBo())))
             }
         )
         return NotesViewModel(useCase)

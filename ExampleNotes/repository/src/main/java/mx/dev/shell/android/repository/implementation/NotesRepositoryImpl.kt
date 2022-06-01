@@ -1,6 +1,5 @@
 package mx.dev.shell.android.repository.implementation
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mx.dev.shell.android.core.model.NoteBo
@@ -15,8 +14,8 @@ class NotesRepositoryImpl @Inject constructor(
     private val noteMapper: NoteMapper
 ) : NotesRepository {
 
-    override suspend fun loadNotes(): Flow<Result<List<NoteBo>>> {
-        return source.queryNotes().map {
+    override suspend fun loadNotes() =
+        source.queryNotes().map {
             if (it.isSuccess) {
                 try {
                     Result.success(noteMapper.fromListDoToListBo(it.getOrNull().orEmpty()))
@@ -27,13 +26,12 @@ class NotesRepositoryImpl @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
-    }
 
-    override suspend fun queryNote(noteId: Int): Flow<Result<NoteBo>> {
-        return source.queryNote(noteId).map {
+    override suspend fun queryNote(noteId: Int) =
+        source.queryNote(noteId).map {
             if (it.isSuccess) {
                 try {
-                    Result.success(noteMapper.fromDoToBo(it.getOrNull()?: NoteDo()))
+                    Result.success(noteMapper.fromDoToBo(it.getOrNull() ?: NoteDo()))
                 } catch (e: Exception) {
                     Result.failure(e)
                 }
@@ -41,15 +39,14 @@ class NotesRepositoryImpl @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
-    }
 
-    override suspend fun saveNote(newNote: NoteBo): Flow<Result<Int>> {
-        return try {
+    override suspend fun saveNote(newNote: NoteBo) =
+        try {
             val noteDo = noteMapper.fromBoToDo(newNote)
             source.saveNote(noteDo)
                 .map {
                     if (it.isSuccess) {
-                        Result.success(it.getOrNull()?.id?:0)
+                        Result.success(it.getOrNull()?.id ?: 0)
                     } else {
                         Result.failure(it.exceptionOrNull()!!)
                     }
@@ -57,5 +54,4 @@ class NotesRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
-    }
 }

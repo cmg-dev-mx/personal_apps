@@ -93,7 +93,6 @@ class NoteDetailViewModelShould : BaseUnitTest() {
                 emit(Result.success(expected))
             }
         )
-
         `when`(useCase.saveNote(expected)).thenReturn(
             flow {
                 emit(Result.success(noteId))
@@ -108,7 +107,6 @@ class NoteDetailViewModelShould : BaseUnitTest() {
                 emit(Result.failure(exceptionExpected))
             }
         )
-
         `when`(useCase.saveNote(expected)).thenReturn(
             flow {
                 emit(Result.failure(exceptionExpected))
