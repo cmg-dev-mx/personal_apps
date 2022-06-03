@@ -1,5 +1,6 @@
 package mx.dev.shell.android.repository.implementation
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mx.dev.shell.android.core.model.NoteBo
@@ -54,4 +55,8 @@ class NotesRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
+
+    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> {
+        TODO("Not yet implemented")
+    }
 }

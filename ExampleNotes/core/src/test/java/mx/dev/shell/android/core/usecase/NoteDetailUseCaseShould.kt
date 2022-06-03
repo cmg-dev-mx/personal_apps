@@ -57,11 +57,33 @@ class NoteDetailUseCaseShould: BaseUnitTest() {
         assertEquals(errorExpected, uc.saveNote(expected).first().exceptionOrNull()!!)
     }
 
+    @Test
+    fun deleteNoteFromRepository() = runTest {
+        val uc = mockSuccessfulCase()
+        uc.deleteNote(noteId)
+        verify(repository, times(1)).deleteNote(noteId)
+    }
+
+    @Test
+    fun emitNoteIdFromRepositoryWhenDeleteNote() = runTest {
+        val uc = mockSuccessfulCase()
+        assertEquals(noteId, uc.deleteNote(noteId).first().getOrNull()!!)
+    }
+
+    @Test
+    fun emitErrorWhenDeleteNoteFromRepository() = runTest {
+        val uc = mockFailureCase()
+        assertEquals(errorExpected, uc.deleteNote(noteId).first().exceptionOrNull()!!)
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDetailUseCaseImpl {
         `when`(repository.queryNote(noteId)).thenReturn(
             flow { emit(Result.success(expected)) }
         )
         `when`(repository.saveNote(expected)).thenReturn(
+            flow { emit(Result.success(noteId)) }
+        )
+        `when`(repository.deleteNote(noteId)).thenReturn(
             flow { emit(Result.success(noteId)) }
         )
         return NoteDetailUseCaseImpl(repository)
@@ -72,6 +94,9 @@ class NoteDetailUseCaseShould: BaseUnitTest() {
             flow { emit(Result.failure(errorExpected)) }
         )
         `when`(repository.saveNote(expected)).thenReturn(
+            flow { emit(Result.failure(errorExpected)) }
+        )
+        `when`(repository.deleteNote(noteId)).thenReturn(
             flow { emit(Result.failure(errorExpected)) }
         )
         return NoteDetailUseCaseImpl(repository)

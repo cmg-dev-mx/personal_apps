@@ -13,7 +13,5 @@ class NoteDetailUseCaseImpl @Inject constructor(
 
     override suspend fun saveNote(note: NoteBo) = repository.saveNote(note)
 
-    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> = repository.deleteNote(noteId)
 }
