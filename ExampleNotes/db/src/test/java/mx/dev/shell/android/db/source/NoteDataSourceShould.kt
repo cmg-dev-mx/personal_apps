@@ -77,10 +77,30 @@ class NoteDataSourceShould: BaseUnitTest() {
         assertEquals(errorExpected, source.saveNote(noteExpected).first().exceptionOrNull()!!)
     }
 
+    @Test
+    fun deleteNoteFromSource() = runTest {
+        val source = mockSuccessfulCase()
+        source.deleteNote(noteId)
+        verify(dao, times(1)).deleteNote(noteId)
+    }
+
+    @Test
+    fun emitNoteIdFromSourceInDeleteNote() = runTest {
+        val source = mockSuccessfulCase()
+        assertEquals(noteId, source.deleteNote(noteId).first().getOrNull()!!)
+    }
+
+    @Test
+    fun emitErrorFromSourceInDeleteNote() = runTest {
+        val source = mockFailureCase()
+        assertEquals(errorExpected, source.deleteNote(noteId).first().exceptionOrNull()!!)
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDataSourceImpl {
         `when`(dao.getAllNotes()).thenReturn(expected)
         `when`(dao.getNote(noteId)).thenReturn(noteExpected)
         `when`(dao.insertNote(noteExpected)).thenReturn(0)
+        `when`(dao.deleteNote(noteId)).thenReturn(noteId)
         return NoteDataSourceImpl(dao)
     }
 
@@ -88,6 +108,7 @@ class NoteDataSourceShould: BaseUnitTest() {
         `when`(dao.getAllNotes()).thenThrow(errorExpected)
         `when`(dao.getNote(noteId)).thenThrow(errorExpected)
         `when`(dao.insertNote(noteExpected)).thenThrow(errorExpected)
+        `when`(dao.deleteNote(noteId)).thenThrow(errorExpected)
         return NoteDataSourceImpl(dao)
     }
 }

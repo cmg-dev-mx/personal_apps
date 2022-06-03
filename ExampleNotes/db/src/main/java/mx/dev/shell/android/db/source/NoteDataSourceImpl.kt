@@ -32,7 +32,10 @@ class NoteDataSourceImpl @Inject constructor(
         flow { emit(Result.failure(e)) }
     }
 
-    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> {
-        TODO("Not yet implemented")
+    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> = try {
+        val deleted = dao.deleteNote(noteId)
+        flow { emit(Result.success(deleted)) }
+    } catch (e: Exception) {
+        flow { emit(Result.failure(e)) }
     }
 }
