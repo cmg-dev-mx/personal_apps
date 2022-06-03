@@ -31,7 +31,7 @@ class NotesRepositoryImpl @Inject constructor(
         source.queryNote(noteId).map {
             if (it.isSuccess) {
                 try {
-                    Result.success(noteMapper.fromDoToBo(it.getOrNull() ?: NoteDo()))
+                    Result.success(noteMapper.fromDoToBo(it.getOrNull() ?: NoteDo(0L, "", 0, "")))
                 } catch (e: Exception) {
                     Result.failure(e)
                 }

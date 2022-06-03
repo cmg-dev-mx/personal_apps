@@ -7,11 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "note")
 data class NoteDo(
     @ColumnInfo(name = "creation_date")
-    var creationDate: Long = 0L,
+    var creationDate: Long?,
     @ColumnInfo(name = "description")
-    var description: String = "",
+    var description: String?,
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0,
+    var id: Int,
     @ColumnInfo(name = "title")
-    var title: String = ""
+    var title: String?
 )
