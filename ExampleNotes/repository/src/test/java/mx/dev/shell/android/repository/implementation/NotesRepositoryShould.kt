@@ -117,6 +117,25 @@ class NotesRepositoryShould: BaseUnitTest() {
         assertEquals(errorExpected, repository.saveNote(noteExpected).first().exceptionOrNull())
     }
 
+    @Test
+    fun deleteNoteFromSource() = runTest {
+        val repository = mockSuccessfulCase()
+        repository.deleteNote(noteId)
+        verify(source, times(1)).deleteNote(noteId)
+    }
+
+    @Test
+    fun emitNoteIdFromSourceInDeleteNote() = runTest {
+        val repository = mockSuccessfulCase()
+        assertEquals(noteId, repository.deleteNote(noteId).first().getOrNull())
+    }
+
+    @Test
+    fun emitErrorFromSourceInDeleteNote() = runTest {
+        val repository = mockFailureCase()
+        assertEquals(errorExpected, repository.deleteNote(noteId).first().exceptionOrNull())
+    }
+
     private suspend fun mockSuccessfulCase(): NotesRepositoryImpl {
         `when`(source.queryNotes()).thenReturn(
             flow {
@@ -136,6 +155,11 @@ class NotesRepositoryShould: BaseUnitTest() {
             }
         )
         `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
+        `when`(source.deleteNote(noteId)).thenReturn(
+            flow {
+                emit(Result.success(noteId))
+            }
+        )
 
         return NotesRepositoryImpl(source, noteMapper)
     }
@@ -148,6 +172,11 @@ class NotesRepositoryShould: BaseUnitTest() {
         )
         `when`(noteMapper.fromBoToDo(noteExpected)).thenReturn(noteDo)
         `when`(source.saveNote(noteDo)).thenReturn(
+            flow {
+                emit(Result.failure(errorExpected))
+            }
+        )
+        `when`(source.deleteNote(noteId)).thenReturn(
             flow {
                 emit(Result.failure(errorExpected))
             }

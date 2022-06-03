@@ -7,4 +7,5 @@ interface NoteDataSource {
     suspend fun queryNotes(): Flow<Result<List<NoteDo>>>
     suspend fun queryNote(noteId: Int): Flow<Result<NoteDo>>
     suspend fun saveNote(note: NoteDo): Flow<Result<NoteDo>>
+    suspend fun deleteNote(noteId: Int): Flow<Result<Int>>
 }
