@@ -43,6 +43,11 @@ class NotesFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadNotes()
+    }
+
     private fun setupView() {
         binding.notesNotesRec.apply {
             layoutManager = LinearLayoutManager(context)

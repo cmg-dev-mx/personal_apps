@@ -11,7 +11,7 @@ data class NoteDo(
     @ColumnInfo(name = "description")
     var description: String = "",
     @PrimaryKey(autoGenerate = true)
-    var id: Int = -1,
+    var id: Int = 0,
     @ColumnInfo(name = "title")
     var title: String = ""
 )
