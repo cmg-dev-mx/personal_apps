@@ -87,6 +87,67 @@ class NoteDetailViewModelShould : BaseUnitTest() {
         }
     }
 
+    @Test
+    fun showProgressBarWhenSaveNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.showProgressBar.captureValues {
+            vm.saveNote(expected)
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun hideProgressBarWhenFinishSaveNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.showProgressBar.captureValues {
+            vm.saveNote(expected)
+            assertEquals(false, values.last())
+        }
+    }
+
+    @Test
+    fun deleteNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.deleteNote(noteId)
+        verify(useCase, times(1)).deleteNote(noteId)
+    }
+
+    @Test
+    fun emitNoteIdFromUseCaseInDeleteNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.deleteNote(noteId)
+        vm.noteDeleted.captureValues {
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun emitErrorFromUseCaseInDeleteNote() = runTest {
+        val vm = mockFailureCase()
+        vm.deleteNote(noteId)
+        vm.errorMessage.captureValues {
+            assertEquals(exceptionExpected.message, values.first())
+        }
+    }
+
+    @Test
+    fun showProgressBarWhenDeleteNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.showProgressBar.captureValues {
+            vm.deleteNote(noteId)
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun hideProgressBarWhenFinishDeleteNote() = runTest {
+        val vm = mockSuccessfulCase()
+        vm.showProgressBar.captureValues {
+            vm.deleteNote(noteId)
+            assertEquals(false, values.last())
+        }
+    }
+
     private suspend fun mockSuccessfulCase(): NoteDetailViewModel {
         `when`(useCase.queryNote(noteId)).thenReturn(
             flow {
@@ -94,6 +155,11 @@ class NoteDetailViewModelShould : BaseUnitTest() {
             }
         )
         `when`(useCase.saveNote(expected)).thenReturn(
+            flow {
+                emit(Result.success(noteId))
+            }
+        )
+        `when`(useCase.deleteNote(noteId)).thenReturn(
             flow {
                 emit(Result.success(noteId))
             }
@@ -108,6 +174,11 @@ class NoteDetailViewModelShould : BaseUnitTest() {
             }
         )
         `when`(useCase.saveNote(expected)).thenReturn(
+            flow {
+                emit(Result.failure(exceptionExpected))
+            }
+        )
+        `when`(useCase.deleteNote(noteId)).thenReturn(
             flow {
                 emit(Result.failure(exceptionExpected))
             }

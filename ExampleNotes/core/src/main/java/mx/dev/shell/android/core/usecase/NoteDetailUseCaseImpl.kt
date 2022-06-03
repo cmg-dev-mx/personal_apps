@@ -1,5 +1,6 @@
 package mx.dev.shell.android.core.usecase
 
+import kotlinx.coroutines.flow.Flow
 import mx.dev.shell.android.core.model.NoteBo
 import mx.dev.shell.android.core.repository.NotesRepository
 import javax.inject.Inject
@@ -11,4 +12,8 @@ class NoteDetailUseCaseImpl @Inject constructor(
     override suspend fun queryNote(noteId: Int) = repository.queryNote(noteId)
 
     override suspend fun saveNote(note: NoteBo) = repository.saveNote(note)
+
+    override suspend fun deleteNote(noteId: Int): Flow<Result<Int>> {
+        TODO("Not yet implemented")
+    }
 }
